@@ -1,64 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import buildingImg from "../assets/facade.jpeg";
-import renovationImg from "../assets/cuisine.jpg";
-import kitchenImg from "../assets/cuisine.jpeg";
-import bathroomImg from "../assets/sdb.jpg";
-import carportImg from "../assets/abri.jpeg";
 import { Link } from "react-router-dom";
 
 const ServicesPage = () => {
-  const services = [
-    {
-      id: 1,
-      title: "Construction",
-      description:
-        "Nous réalisons des projets de construction sur mesure, combinant qualité, durabilité et esthétique pour répondre à vos besoins.",
-      image: buildingImg,
-      category: "Industriel", // Building category
-    },
-    {
-      id: 2,
-      title: "Rénovation Total ",
-      description:
-        "Transformez votre espace existant avec nos services de rénovation, alliant modernité et respect du style d'origine.",
-      image: renovationImg,
-      category: "Rénovation", // Renovation category
-    },
-    {
-      id: 3,
-      title: "Cuisines",
-      description:
-        "Nous concevons et installons des cuisines fonctionnelles et élégantes adaptées à votre style de vie.",
-      image: kitchenImg,
-      category: "Maison", // House category
-    },
-    {
-      id: 4,
-      title: "Salles de Bain",
-      description:
-        "Créez votre espace de détente parfait avec nos solutions de rénovation de salles de bain modernes.",
-      image: bathroomImg,
-      category: "Maison", // House category
-    },
-    {
-      id: 5,
-      title: "Abri pour Voitures",
-      description:
-        "Protégez vos véhicules avec nos abris élégants et robustes conçus pour durer.",
-      image: carportImg,
-      category: "Industriel", 
-    },
-    {
-      id: 6,
-      title: "Peinture Totale Maison",
-      description:"nous faisons une peinture totale pour votre maison ou vos chambres privées.",
-      image: "https://cdn.futura-sciences.com/sources/images/SP_peinture_murale_sejour_1.jpg",
-      category: "Maison", 
-    }
-  ];
-
+  const [services, setServices] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/services"); 
+        const data = await response.json();
+        setServices(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   // Filter services based on the selected category
   const filteredServices =
@@ -85,85 +48,62 @@ const ServicesPage = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           Explorez notre large gamme de services, allant de la construction à
-          l'aménagement de maisons, en passant par la rénovation complète de
-          vos espaces.
+          l'aménagement de maisons, en passant par la rénovation complète de vos
+          espaces.
         </motion.p>
 
         {/* Filter Buttons */}
         <div className="mb-8 flex justify-center space-x-4">
-          <button
-            onClick={() => setSelectedCategory("Tous")}
-            className={`py-2 px-4 rounded-full ${
-              selectedCategory === "Tous"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Tous
-          </button>
-          <button
-            onClick={() => setSelectedCategory("Maison")}
-            className={`py-2 px-4 rounded-full ${
-              selectedCategory === "Maison"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Maison
-          </button>
-          <button
-            onClick={() => setSelectedCategory("Rénovation")}
-            className={`py-2 px-4 rounded-full ${
-              selectedCategory === "Rénovation"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Rénovation
-          </button>
-          <button
-            onClick={() => setSelectedCategory("Industriel")}
-            className={`py-2 px-4 rounded-full ${
-              selectedCategory === "Industriel"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Industriel
-          </button>
+          {["Tous", "Maison", "Rénovation", "Industriel"].map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`py-2 px-4 rounded-full ${
+                selectedCategory === category
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Services Grid */}
-      <div className="container mx-auto px-6 lg:px-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredServices.map((service, index) => (
-          <motion.div
-            key={index}
-            className="bg-white shadow-lg rounded-lg overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 * index }}
-          >
-            <img
-              src={service.image}
-              alt={service.title}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                {service.title}
-              </h3>
-              <p className="text-gray-700 mb-4">{service.description}</p>
-              <Link
-                to="/projects"
-                className="text-yellow-500 font-semibold hover:underline"
-              >
-                Voir Projets
-              </Link>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {/* Loading State */}
+      {loading ? (
+        <p className="text-center text-gray-600">Chargement des services...</p>
+      ) : (
+        <div className="container mx-auto px-6 lg:px-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredServices.map((service, index) => (
+            <motion.div
+              key={service._id}
+              className="bg-white shadow-lg rounded-lg overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 * index }}
+            >
+              <img
+                src={`http://localhost:5000${service.image}`} // Replace with database images later
+                alt={service.title}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  {service.title}
+                </h3>
+                <p className="text-gray-700 mb-4">{service.description}</p>
+                <Link
+                  to="/projects"
+                  className="text-yellow-500 font-semibold hover:underline"
+                >
+                  Voir Projets
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </section>
   );
 };

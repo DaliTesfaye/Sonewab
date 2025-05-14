@@ -23,12 +23,11 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Contact Us button on the right */}
         <Link
-          to="/contact"
+          to="/admin/login"
           className="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 hidden md:block"
         >
-          Contactez-Nous
+          Admin Register
         </Link>
 
         {/* Mobile Menu */}

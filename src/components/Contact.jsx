@@ -1,91 +1,120 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Contact = () => {
+  const navigate = useNavigate();
+
+  const [nom, setNom] = useState("");
+  const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [sujet, setSujet] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = { nom, email, telephone, sujet, message };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de l'envoi");
+
+      navigate("/success"); // ✅ redirection après succès
+    } catch (err) {
+      alert("Une erreur est survenue !");
+    }
+  };
+
   return (
     <section className="bg-gray-50">
       <div className="py-12 lg:py-20 px-6 mx-auto max-w-screen-md">
-        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="mb-6 text-4xl tracking-tight font-bold text-center text-gray-800">
+          <h2 className="mb-6 text-4xl font-bold text-center text-gray-800">
             Contact-Nous
           </h2>
-          <p className="mb-12 text-center text-lg font-light text-gray-600">
-            Proposer votre projet ou construction de reve et notre equipe va
-            vous aider a le realiser.
+          <p className="mb-12 text-center text-lg text-gray-600">
+            Proposez votre projet ou construction de rêve, notre équipe vous aidera à le réaliser.
           </p>
         </motion.div>
 
-        {/* Form */}
         <motion.form
+          onSubmit={handleSubmit}
+          className="space-y-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          action="#"
-          className="space-y-8"
         >
-          {/* Email Input */}
           <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-800"
-            >
-              Ton Email
-            </label>
+            <label className="block mb-2 text-sm text-gray-800">Ton Email</label>
             <input
               type="email"
-              id="email"
-              className="shadow-sm bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-3"
-              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
+              className="w-full p-3 border rounded-lg text-sm bg-white text-gray-800"
+              placeholder="name@example.com"
             />
           </div>
-
-          {/* Subject Input */}
           <div>
-            <label
-              htmlFor="subject"
-              className="block mb-2 text-sm font-medium text-gray-800"
-            >
-              Sujet
-            </label>
+            <label className="block mb-2 text-sm text-gray-800">Numéro</label>
             <input
               type="text"
-              id="subject"
-              className="block p-3 w-full text-sm text-gray-800 bg-white rounded-lg border border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-              placeholder="comment on peux vous aider?"
+              value={telephone}
+              onChange={(e) => setTelephone(e.target.value)}
               required
+              className="w-full p-3 border rounded-lg text-sm bg-white text-gray-800"
+              placeholder="+21612345678"
             />
           </div>
-
-          {/* Message Textarea */}
-          <div className="sm:col-span-2">
-            <label
-              htmlFor="message"
-              className="block mb-2 text-sm font-medium text-gray-800"
-            >
-              Votre Message
-            </label>
-            <textarea
-              id="message"
-              rows="6"
-              className="block p-3 w-full text-sm text-gray-800 bg-white rounded-lg shadow-sm border border-gray-300 focus:ring-yellow-500 focus:border-yellow-500"
-              placeholder="Leave a comment or idea..."
+          <div>
+            <label className="block mb-2 text-sm text-gray-800">Nom</label>
+            <input
+              type="text"
+              value={nom}
+              onChange={(e) => setNom(e.target.value)}
               required
+              className="w-full p-3 border rounded-lg text-sm bg-white text-gray-800"
+              placeholder="Ahmed Ben Mohamed"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-sm text-gray-800">Sujet</label>
+            <input
+              type="text"
+              value={sujet}
+              onChange={(e) => setSujet(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg text-sm bg-white text-gray-800"
+              placeholder="Comment pouvons-nous vous aider ?"
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-sm text-gray-800">Votre Message</label>
+            <textarea
+              rows="6"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg text-sm bg-white text-gray-800"
+              placeholder="Laissez votre message ici..."
             ></textarea>
           </div>
-
-          {/* Submit Button */}
           <div className="text-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              className="bg-yellow-500 px-6 py-3 text-lg font-semibold text-white rounded-lg hover:bg-yellow-600 transition duration-300"
+              className="bg-yellow-500 px-6 py-3 text-lg font-semibold text-white rounded-lg hover:bg-yellow-600 transition"
             >
               Envoyer Message
             </motion.button>
