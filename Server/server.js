@@ -5,10 +5,12 @@ require("dotenv").config();
 const app = express();
 
 
+
 // Import Routes
 const projectRoutes = require("./routes/Projects")
 const serviceRoutes = require("./routes/Services")
 const authRoutes = require("./routes/Auth")
+const contactRoutes = require("./routes/Contacts");
 
 //Middlewares
 app.use(express.json());
@@ -21,11 +23,13 @@ mongoose
   .catch((error) => console.log("MongoDB Connection Error:", error));
 
 // Use Routes
-app.use("/api/projects", require("./routes/Projects"));
+app.use("/api/projects", projectRoutes);
 app.use("/api/services" , serviceRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/auth" , authRoutes)
+app.use("/api/contacts", contactRoutes);
+
 
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`http://localhost:${PORT}`));

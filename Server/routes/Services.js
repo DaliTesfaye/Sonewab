@@ -5,13 +5,13 @@ const path = require("path");
 
 const router = express.Router();
 
-// 📂 Configurer le stockage local pour les images des services
+//Configurer le stockage local pour les images des services
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); // 📁 Dossier où enregistrer les images
+        cb(null, "uploads/"); 
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Renommer avec un timestamp
+        cb(null, Date.now() + path.extname(file.originalname));
     },
 });
 
@@ -28,6 +28,18 @@ router.get("/", async (req, res) => {
     }
 });
 
+//Get Service by ID 
+router.get("/:id", async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.id);
+        if (!service) return res.status(404).json({ error: "Service Not Found" });
+        res.json(service);
+    } catch (err) {
+        res.status(500).json({ error: "Server Error" });
+    }
+});
+
+
 //Create Service
 router.post("/", upload.single("image"), async (req, res) => {
     try {
@@ -40,10 +52,10 @@ router.post("/", upload.single("image"), async (req, res) => {
         let imagePath = "";
 
         if (req.file) {
-            // 📂 Image locale (Stockée dans /uploads/)
+            //Image locale 
             imagePath = `/uploads/${req.file.filename}`;
         } else if (image) {
-            // 🌍 Image en ligne (Lien URL)
+            // Image en ligne 
             imagePath = image;
         } else {
             return res.status(400).json({ error: "Veuillez fournir une image" });
@@ -59,19 +71,27 @@ router.post("/", upload.single("image"), async (req, res) => {
 });
 
 // Modify Service
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single("image"), async (req, res) => {
     try {
-        const updatedService = await Service.findByIdAndUpdate(res.params.id, req.body, { new: true });
-        if (!updatedService) return res.status(404).json({ error: "Service Not Found" })
+        const { title, description, category } = req.body;
+        let updatedData = { title, description, category };
+
+        if (req.file) {
+            updatedData.image = `/uploads/${req.file.filename}`;
+        }
+
+        const updatedService = await Service.findByIdAndUpdate(req.params.id, updatedData, { new: true });
+
+        if (!updatedService) return res.status(404).json({ error: "Service Not Found" });
+
         res.json(updatedService);
-    }
-    catch (err) {
-        res.status(500).json({ err: "Server Error" });
+    } catch (err) {
+        res.status(500).json({ error: "Server Error" });
     }
 });
 
-//Delete Services
 
+//Delete Services
 router.delete("/:id", async (req, res) => {
     try {
         const deletedService = await Service.findByIdAndDelete(req.params.id);

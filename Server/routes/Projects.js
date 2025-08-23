@@ -2,6 +2,7 @@ const express = require("express");
 const Project = require("../models/Project");
 const multer = require("multer");
 const path = require("path");
+const { log } = require("console");
 
 const router = express.Router();
 
@@ -27,10 +28,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ Get a single project by ID
+// Get a single project by ID
 router.get("/:id", async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
+    
     if (!project) return res.status(404).json({ message: "Project Not Found" });
     res.json(project);
   } catch (err) {
@@ -38,31 +40,31 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ✅ Create a new project (Supports file upload or direct URL)
+// Create a new project 
 router.post("/", upload.single("image"), async (req, res) => {
   try {
     const { title, description, category, imageUrl } = req.body;
 
-    if (!title || !description) {
+    if (!title || !description || !category) {
       return res.status(400).json({ error: "Title and description are required" });
     }
 
     let imagePath = "";
 
-    // ✅ If user uploads a file, save the file path
+    // If user uploads a file, save the file path
     if (req.file) {
       imagePath = `/uploads/${req.file.filename}`;
     }
-    // ✅ If user provides an online image URL, store it directly
+    // If user provides an online image URL, store it directly
     else if (imageUrl) {
       imagePath = imageUrl;
     }
-    // ❌ If neither file nor URL is provided, return an error
+    // If neither file nor URL is provided, return an error
     else {
       return res.status(400).json({ error: "An image is required (upload or URL)" });
     }
 
-    // Create the project with the image path (local or online)
+    // Create the project with the image path 
     const newProject = new Project({ title, description, category, image: imagePath });
     await newProject.save();
 
@@ -74,7 +76,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
 
 
-// ✅ Update a project (Supports image update)
+// Update a project 
 router.put("/:id", upload.single("image"), async (req, res) => {
   try {
     const { title, description, category, imageUrl } = req.body;
@@ -99,7 +101,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
   }
 });
 
-// ✅ Delete a project
+//Delete a project
 router.delete("/:id", async (req, res) => {
   try {
     const deletedProject = await Project.findByIdAndDelete(req.params.id);

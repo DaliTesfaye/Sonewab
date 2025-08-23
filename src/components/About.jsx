@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import img2 from "../assets/facade.jpeg";
 import { motion } from "framer-motion";
 
@@ -51,12 +52,12 @@ const About = () => {
             objectif est d’offrir qualité, efficacité et satisfaction tout en
             façonnant l’horizon de demain.
           </p>
-          <a
-            href="#services"
+          <Link
+            to="/AboutPage"
             className="mt-6 inline-block bg-yellow-500 text-black px-6 py-3 text-lg font-semibold rounded hover:bg-yellow-600"
           >
-            Learn More About Us
-          </a>
+            En Savoir Plus 
+          </Link>
         </motion.div>
       </div>
     </section>
