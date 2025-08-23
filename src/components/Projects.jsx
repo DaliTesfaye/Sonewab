@@ -1,55 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import img1 from "../assets/sdb.jpg";
-import img2 from "../assets/abri.jpeg";
-import img3 from "../assets/cuisine.jpg";
-
-
-const projects = [
-  {
-    id: 1,
-    title: "Renovation SDB",
-    description: "Luxury renovation of a bathroom with modern materials.",
-    image: img1,
-  },
-  {
-    id: 2,
-    title: "Abri de voiture",
-    description: "Construction of car shelters with robust materials.",
-    image: img2,
-  },
-  {
-    id: 3,
-    title: "Cuisine Renovation",
-    description: "Complete renovation of the kitchen for functionality and style.",
-    image: img3,
-  },
-];
-
-export const extendedProjects = [
-  ...projects,
-  {
-    id: 4,
-    title: "Garden Landscape",
-    description: "Beautiful garden landscaping with natural materials.",
-    image: img3,
-  },
-  {
-    id: 5,
-    title: "Pool Installation",
-    description: "Luxurious pool installations for modern homes.",
-    image: img2,
-  },
-  {
-    id: 6,
-    title: "Office Renovation",
-    description: "Complete renovation of office spaces for productivity.",
-    image: img1,
-  },
-];
 
 const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/projects"); 
+        if (!response.ok) throw new Error("Failed to fetch projects");
+        const data = await response.json();
+        setProjects(data.slice(0, 3)); 
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  if (loading) return <p className="text-center text-lg">Chargement...</p>;
+  if (error) return <p className="text-center text-red-600">{error}</p>;
+
   return (
     <section id="projects" className="py-16 bg-gray-50">
       <div className="container mx-auto px-6">
@@ -61,18 +38,19 @@ const Projects = () => {
             Découvrez les projets complets réalisés par notre équipe.
           </p>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <motion.div
-              key={project.id}
+              key={project._id}
               className="bg-white rounded-lg shadow-lg overflow-hidden"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: project.id * 0.2 }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
             >
               <img
-                src={project.image}
+                src={project.image.startsWith("http") ? project.image : `http://localhost:5000${project.image}`}
                 alt={project.title}
                 className="w-full h-48 object-cover"
               />
@@ -84,7 +62,7 @@ const Projects = () => {
                   {project.description.slice(0, 30)}...
                 </p>
                 <Link
-                  to={`/projects/${project.id}`}
+                  to={`/projects/${project._id}`}
                   className="inline-block bg-yellow-500 text-black px-4 py-2 text-sm font-medium rounded hover:bg-yellow-600 transition"
                 >
                   Voir les Détails
@@ -93,6 +71,7 @@ const Projects = () => {
             </motion.div>
           ))}
         </div>
+
         <div className="mt-12 flex justify-center">
           <Link
             to="/projects"
