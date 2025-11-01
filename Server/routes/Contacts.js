@@ -2,7 +2,7 @@ const express = require("express");
 const Contact = require("../models/Contact");
 const router = express.Router();
 
-// @route POST /api/contacts
+//Add New Contact
 router.post("/", async (req, res) => {
   try {
     const { nom, email, telephone, sujet, message } = req.body;
